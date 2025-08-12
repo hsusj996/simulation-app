@@ -1,4 +1,5 @@
-﻿using System;
+﻿using simulation_app.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,12 @@ namespace simulation_app.Views
     /// </summary>
     public partial class MainView : Window
     {
+        private MainViewModel vm = new MainViewModel();
+
         public MainView()
         {
             InitializeComponent();
+            vm.TestReadWrite();
         }
     }
 }

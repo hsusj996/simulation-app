@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace simulation_app.Services
+﻿namespace simulation_app.Services
 {
-    internal class IDataService
+    public interface IDataService
     {
+        string ReadFromFile(string path);
+        bool WriteToFile(string path, string content);
     }
 }

@@ -1,10 +1,14 @@
-#pragma once
-
+﻿#pragma once
 #include <string>
 
-class FileDataAccess {
-public:
-	std::string ReadFromFile(const std::string& path);
+#ifdef NATIVELIB_EXPORTS
+#define NATIVELIB_API __declspec(dllexport)
+#else
+#define NATIVELIB_API __declspec(dllimport)
+#endif
 
-	bool WriteToFile(const std::string& path, const std::string& content);
+class NATIVELIB_API FileDataAccess {
+public:
+    std::string ReadFromFile(const std::string& path);
+    bool WriteToFile(const std::string& path, const std::string& content);
 };
