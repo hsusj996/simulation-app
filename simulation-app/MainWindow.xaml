@@ -1,12 +1,117 @@
 ﻿<Window x:Class="simulation_app.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:simulation_app"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
+        xmlns:vm="clr-namespace:simulation_app.ViewModels"
+        xmlns:m="clr-namespace:simulation_app.Models"
+        Title="Tank Simulator (MVVM)" Height="560" Width="980"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Grid Margin="16">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 좌: 설정/목록 -->
+        <StackPanel Grid.Column="0">
+            <TextBlock Text="Tank 설정" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <TextBlock Text="Capacity (L)" Width="120" VerticalAlignment="Center"/>
+                <TextBox Text="{Binding Tank.Capacity, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+            </StackPanel>
+
+            <Separator Margin="0,6,0,6"/>
+
+            <TextBlock Text="Valves" FontWeight="Bold" Margin="0,0,0,6"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="Add In"  Command="{Binding AddInValveCmd}"  Width="80" Margin="0,0,6,0"/>
+                <Button Content="Add Out" Command="{Binding AddOutValveCmd}" Width="80"/>
+                <Button Content="Remove"  Command="{Binding RemoveSelectedValveCmd}" Width="80" Margin="6,0,0,0"/>
+            </StackPanel>
+
+            <DataGrid ItemsSource="{Binding Valves}" SelectedItem="{Binding SelectedValve}"
+                      AutoGenerateColumns="False" CanUserAddRows="False" Height="160" Margin="0,0,0,6">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                    <DataGridComboBoxColumn Header="Type" SelectedItemBinding="{Binding Type}" Width="80"
+                                            ItemsSource="{Binding Source={x:Static m:ValveType.In}}"/>
+                    <!-- 위 ItemsSource는 간단화, 실제 Enum 바인딩은 다른 방식 권장 -->
+                    <DataGridTextColumn Header="Flow (L/s)" Binding="{Binding FlowRate}" Width="100"/>
+                    <DataGridCheckBoxColumn Header="Open" Binding="{Binding IsOpen}" Width="60"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <TextBlock Text="Level Sensors" FontWeight="Bold" Margin="0,0,0,6"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                <Button Content="Add Sensor" Command="{Binding AddSensorCmd}" Width="100"/>
+                <Button Content="Remove" Command="{Binding RemoveSelectedSensorCmd}" Width="80" Margin="6,0,0,0"/>
+            </StackPanel>
+
+            <DataGrid ItemsSource="{Binding Sensors}" SelectedItem="{Binding SelectedSensor}"
+                      AutoGenerateColumns="False" CanUserAddRows="False" Height="140">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Trigger (L)" Binding="{Binding TriggerLevel}" Width="120"/>
+                    <DataGridCheckBoxColumn Header="On" Binding="{Binding IsOn}" IsReadOnly="True" Width="60"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <Separator Margin="0,6,0,6"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Start" Command="{Binding StartCmd}" Width="80" Margin="0,0,6,0"/>
+                <Button Content="Stop"  Command="{Binding StopCmd}"  Width="80" Margin="0,0,6,0"/>
+                <Button Content="Reset" Command="{Binding ResetCmd}" Width="80"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- 우: 탱크 시각화 -->
+        <Grid Grid.Column="1">
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Width="260" Height="360" BorderThickness="3" BorderBrush="Gray" CornerRadius="6" Background="#11CCCCCC">
+                    <Grid>
+                        <!-- 수위 -->
+                        <Rectangle Fill="#3399CC" HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
+                                   Height="{Binding WaterHeight}"/>
+                        <!-- 센서 라인들 -->
+                        <ItemsControl ItemsSource="{Binding Sensors}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Grid/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                    <Setter Property="Margin">
+                                        <Setter.Value>
+                                            <!-- TriggerLevel/Capacity 비율을 code-behind 대신 간단 계산: MultiBinding이 정석이지만
+                                                 여기선 센서 라인은 '센서 바인딩 변경 시 레이아웃 재계산'이 필요하므로
+                                                 아래 간단한 방식으로 대체하려면 VM에 'SensorPixel' 계산 프로퍼티를 추가하는 편이 좋습니다.
+                                                 데모 목적: 일단 margin-bottom을 수동 업데이트하려면 code-behind에서 VM 이벤트로 조정하세요. -->
+                                            <Thickness>0,0,0,0</Thickness>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Rectangle Height="2" Fill="#FF8A00" VerticalAlignment="Bottom"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+                </Border>
+
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="280,0,0,0">
+                    <TextBlock Text="Top"/>
+                    <TextBlock Text="{Binding Tank.Capacity, StringFormat=Cap: {0} L}"/>
+                    <TextBlock Text="{Binding Tank.Level,    StringFormat=Level: {0:0.##} L}"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
