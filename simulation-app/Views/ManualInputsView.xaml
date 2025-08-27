@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="simulation_app.Views.ManualInputsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:simulation_app.ViewModels"
+             xmlns:m="clr-namespace:simulation_app.Models">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 상단 버튼 -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,8">
+            <Button Content="Reload (Mock)" Width="110" Margin="0,0,8,0" Command="{Binding ReloadCmd}"/>
+            <Button Content="Reset Values"  Width="110" Command="{Binding ResetCmd}"/>
+        </StackPanel>
+
+        <!-- 1) Digital Inputs -->
+        <GroupBox Header="Digital Inputs" Grid.Row="1" Margin="0,0,0,8">
+            <DataGrid ItemsSource="{Binding DigitalInputs}" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                    <!-- 즉시 커밋을 위해 TemplateColumn -->
+                    <DataGridTemplateColumn Header="On" Width="60">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <!-- 2) Analog Inputs -->
+        <GroupBox Header="Analog Inputs" Grid.Row="2" Margin="0,0,0,8">
+            <DataGrid ItemsSource="{Binding AnalogInputs}" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name"  Binding="{Binding Name}"  Width="*" />
+                    <DataGridTextColumn Header="Value" Binding="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <!-- 3) Serial Inputs -->
+        <GroupBox Header="Serial Inputs" Grid.Row="3">
+            <DataGrid ItemsSource="{Binding SerialInputs}" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                    <DataGridTextColumn Header="Text" Binding="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="200"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </Grid>
+</UserControl>

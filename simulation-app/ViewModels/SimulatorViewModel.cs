@@ -6,7 +6,7 @@ using simulation_app.Services;
 
 namespace simulation_app.ViewModels
 {
-    public class MainViewModel : BaseNotify
+    public class SimulatorViewModel : BaseNotify
     {
         public Tank Tank { get; } = new Tank();
         public SimulationService Sim { get; }
@@ -48,7 +48,7 @@ namespace simulation_app.ViewModels
             set { _selectedSensor = value; OnPropertyChanged("SelectedSensor"); }
         }
 
-        public MainViewModel()
+        public SimulatorViewModel()
         {
             // 초기값
             Tank.Capacity = 1000;

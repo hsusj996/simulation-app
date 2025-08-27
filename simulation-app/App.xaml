@@ -1,9 +1,17 @@
-﻿<Application x:Class="simulation_app.App"
+﻿<!-- App.xaml -->
+<Application x:Class="simulation_app.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:simulation_app"
+             xmlns:views="clr-namespace:simulation_app.Views"
+             xmlns:vm="clr-namespace:simulation_app.ViewModels"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!-- VM 타입에 따라 자동으로 해당 View 로 보여줌 -->
+        <DataTemplate DataType="{x:Type vm:SimulatorViewModel}">
+            <views:SimulatorView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ManualInputsViewModel}">
+            <views:ManualInputsView/>
+        </DataTemplate>
     </Application.Resources>
 </Application>
